@@ -6,8 +6,8 @@
   "repository": "https://github.com/UlisesGascon/raspberrypi-system-info-data-to-firebase",
   "author": "Ulises Gascon",
   "dependencies": {
-    "child_process": "*",
-    "firebase": "^2.2.6",
+    "child-process-promise": "*",
+    "firebase": "^3.1.0",
     "fs": "0.0.2",
     "util": "^0.10.3"
   }

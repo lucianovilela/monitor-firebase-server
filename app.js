@@ -5,10 +5,16 @@ var fs = require('fs');
 var sys = require('util');
 var exec = require('child_process').exec, child, child1;
 
+  var config = {
+    apiKey: "AIzaSyD03tfMzN7KtNrydxx73ScCDeuXhpDjZdg",
+    authDomain: "ehatdig.firebaseapp.com",
+    databaseURL: "https://ehatdig.firebaseio.com",
+    storageBucket: "ehatdig.appspot.com",
+  };
+ Firebase.initializeApp(config);
 
-/*YOUR SETTINGS!*/
-var firebasePath = "hhttps://<YOUR-FIREBASE-APP>.firebaseio.com"; // Your FirebaseURL.
-var fastTime = 5000; // Time used to check the memory buffered and CPU Temp. 
+
+var fastTime = 5000; // Time used to check the memory buffered and CPU Temp.
 var customTime = 60000; // Time used to check the uptime.
 var slowTime = 10000; // Time used to check the top list and CPU usage.
 
@@ -18,7 +24,7 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
       console.log('exec error: ' + error);
     } else {
       memTotal = stdout.replace("\n","");
-      var myFirebaseRef = new Firebase(firebasePath+"/memory/total");
+      var myFirebaseRef = Firebase.database().ref("/memory/total");
       myFirebaseRef.set(parseInt(memTotal));
     }
   });
@@ -28,19 +34,19 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
     if (error !== null) {
       console.log('exec error: ' + error);
     } else {
-      var hostname = stdout.replace("\n","");	
-      var myFirebaseRef = new Firebase(firebasePath+"/hostname");
+      var hostname = stdout.replace("\n","");
+      var myFirebaseRef = Firebase.database().ref("/hostname");
       myFirebaseRef.set(hostname);
     }
   });
-  
+
   // Function for checking uptime
     child = exec("uptime | tail -n 1 | awk '{print $1}'", function (error, stdout, stderr) {
     if (error !== null) {
       console.log('exec error: ' + error);
     } else {
 	    var uptime = stdout.replace("\n","");
-      	var myFirebaseRef = new Firebase(firebasePath+"/uptime");
+      	var myFirebaseRef = Firebase.database().ref("/uptime");
       	myFirebaseRef.set(uptime);
     }
   });
@@ -50,8 +56,8 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
     if (error !== null) {
       console.log('exec error: ' + error);
     } else {
-      var kernel = stdout.replace("\n","");	
-      var myFirebaseRef = new Firebase(firebasePath+"/kernel");
+      var kernel = stdout.replace("\n","");
+      var myFirebaseRef = Firebase.database().ref("/kernel");
       myFirebaseRef.set(kernel);
     }
   });
@@ -61,28 +67,28 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
 	    if (error !== null) {
 	      console.log('exec error: ' + error);
 	    } else {
-      		var myFirebaseRef = new Firebase(firebasePath+"/toplist");
+      		var myFirebaseRef = Firebase.database().ref("/toplist");
       		myFirebaseRef.set(stdout);
 	    }
 	  });
- 
+
   setInterval(function(){
   // Function for checking memory free and used
     child1 = exec("egrep --color 'MemFree' /proc/meminfo | egrep '[0-9.]{4,}' -o", function (error, stdout, stderr) {
     if (error == null) {
-      memFree = stdout.replace("\n","");      
+      memFree = stdout.replace("\n","");
       memUsed = parseInt(memTotal)-parseInt(memFree);
       percentUsed = Math.round(parseInt(memUsed)*100/parseInt(memTotal));
       percentFree = 100 - percentUsed;
-      
-      var myFbmFRef = new Firebase(firebasePath+"/memory/free");
-	    var myFbmURef = new Firebase(firebasePath+"/memory/used");
-	    var myFbPMURef = new Firebase(firebasePath+"/memory/percent/used"); 
-	    var myFbPMFRef = new Firebase(firebasePath+"/memory/percent/free"); 	  
+
+      var myFbmFRef = Firebase.database().ref("/memory/free");
+	    var myFbmURef = Firebase.database().ref("/memory/used");
+	    var myFbPMURef = Firebase.database().ref("/memory/percent/used");
+	    var myFbPMFRef = Firebase.database().ref("/memory/percent/free");
       myFbmFRef.set(parseInt(memFree));
-	    myFbmURef.set(memUsed); 
+	    myFbmURef.set(memUsed);
 	    myFbPMURef.set(percentUsed);
-	    myFbPMFRef.set(percentFree); 
+	    myFbPMFRef.set(percentFree);
 
     } else {
       sendData = 0;
@@ -95,10 +101,10 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
     if (error == null) {
       memBuffered = stdout.replace("\n","");
       percentBuffered = Math.round(parseInt(memBuffered)*100/parseInt(memTotal));
-      var myFbmBRef = new Firebase(firebasePath+"/memory/buffered");
-      var myFbPMBRef = new Firebase(firebasePath+"/memory/percent/buffered");
+      var myFbmBRef = Firebase.database().ref("/memory/buffered");
+      var myFbPMBRef = Firebase.database().ref("/memory/percent/buffered");
       myFbmBRef.set(parseInt(memBuffered));
-	  myFbPMBRef.set(percentBuffered); 
+	  myFbPMBRef.set(percentBuffered);
 
     } else {
       sendData = 0;
@@ -111,10 +117,10 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
     if (error == null) {
       memCached = stdout.replace("\n","");
       percentCached = Math.round(parseInt(memCached)*100/parseInt(memTotal));
-      var myFbmCRef = new Firebase(firebasePath+"/memory/cached");
-      var myFbPMCRef = new Firebase(firebasePath+"/memory/percent/cached");
+      var myFbmCRef = Firebase.database().ref("/memory/cached");
+      var myFbPMCRef = Firebase.database().ref("/memory/percent/cached");
       myFbmCRef.set(parseInt(memCached));
-	  myFbPMCRef.set(percentCached); 
+	  myFbPMCRef.set(percentCached);
     } else {
       console.log('exec error: ' + error);
     }
@@ -129,10 +135,10 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
       //For charts we need (X axis) time and (Y axis) temperature.
       var date = new Date().getTime();
       var temp = parseFloat(stdout)/1000;
-      var myFbtRef = new Firebase(firebasePath+"/CPU/temp");
-      var myFbttRef = new Firebase(firebasePath+"/CPU/tempdate");
+      var myFbtRef = Firebase.database().ref("/CPU/temp");
+      var myFbttRef = Firebase.database().ref("/CPU/tempdate");
       myFbtRef.set(temp);
-	    myFbttRef.set(date); 
+	    myFbttRef.set(date);
 
     }
   });}, fastTime);
@@ -145,10 +151,10 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
       //For charts we need (X axis) time and (Y axis) percentaje.
       var date = new Date().getTime();
       var cpuUsageUpdate = parseFloat(stdout);
-      var myFbcRef = new Firebase(firebasePath+"/CPU/usage");
-      var myFbctRef = new Firebase(firebasePath+"/CPU/usagedate");
+      var myFbcRef = Firebase.database().ref("/CPU/usage");
+      var myFbctRef = Firebase.database().ref("/CPU/usagedate");
       myFbcRef.set(cpuUsageUpdate);
-	    myFbctRef.set(date);        
+	    myFbctRef.set(date);
     }
   });}, slowTime);
 
@@ -159,11 +165,11 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
 	      console.log('exec error: ' + error);
 	    } else {
 	    	var uptime = stdout.replace("\n","");
-      		var myFirebaseRef = new Firebase(firebasePath+"/uptime");
+      		var myFirebaseRef = Firebase.database().ref("/uptime");
       		myFirebaseRef.set(uptime);
 	    }
 	  });}, customTime);
- 
+
   // TOP list
   setInterval(function(){
     child = exec("ps aux --width 30 --sort -rss --no-headers | head  | awk '{print $11}'", function (error, stdout, stderr) {
@@ -174,10 +180,10 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
       var res = stdout.split("\n");
         for (r in res) {
           if (res[r] != "") {
-                    var myFirebaseRef = new Firebase(firebasePath+"/toplist/"+topControl);
+                    var myFirebaseRef = Firebase.database().ref("/toplist/"+topControl);
                     myFirebaseRef.set(res[r]);
                     topControl++;
               }
         }
-	    }	  
+	    }
 });}, slowTime);

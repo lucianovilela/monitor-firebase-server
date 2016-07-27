@@ -6,7 +6,9 @@ var sys = require('util');
 var exec = require('child_process').exec, child, child1;
 var _=require('underscore');
 
-var commands = [];
+
+
+var commands = require('./config.json');
 
   var config = {
     apiKey: "AIzaSyD03tfMzN7KtNrydxx73ScCDeuXhpDjZdg",
@@ -23,7 +25,7 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
 
 var ref = Firebase.database().ref('comandos');
 
-ref.on("child_added", function(snapshot, prevChildKey){
+ref.on("child_removed", function(snapshot, prevChildKey){
       console.log(snapshot.val());
       commands.push(snapshot.val());
 
@@ -34,15 +36,20 @@ ref.on("child_added", function(snapshot, prevChildKey){
 
 
 setInterval(function(){
-  _.each(commands, function(index, command){
-    child = exec(command.exec, function (error, stdout, stderr) {
-        if (error !== null) {
-          console.error('exec error: ' + error);
-        } else {
-          console.log(command.name + " " + stdout);
-        }
-      }
-    );
+  _.each(commands, function(command){
+    console.log(_.now());
+    console.log(command);
+    if(command.nextexec == undefined || _.now() >= command.nextexec){
+        child = exec(command.exec, function (error, stdout, stderr) {
+            if (error !== null) {
+              console.error('exec error: ' + error);
+            } else {
+              console.log(command.name + " " + stdout);
+            }
+          }
+        );
+        command.nextexec = _.now() + command.time;
+    }
 
 
   });

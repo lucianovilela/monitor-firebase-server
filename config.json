@@ -1,12 +1,12 @@
 [
-  {"name":"teste1",
-   "exec":"ls -lisa",
+  {"name":"temperatura",
+   "exec":"cat /sys/class/thermal/thermal_zone0/temp",
    "time":5000
  },
 
- {"name":"teste2",
-  "exec":"date",
-  "time":1000
+ {"name":"memoria livre",
+  "exec":"egrep --color 'MemFree' /proc/meminfo | egrep '[0-9.]{4,}' -o",
+  "time":10000
   }
 
 ]

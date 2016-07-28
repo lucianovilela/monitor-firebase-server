@@ -69,6 +69,7 @@ var slowTime = 10000; // Time used to check the top list and CPU usage.
 	    } else {
       		var myFirebaseRef = Firebase.database().ref("/toplist");
       		myFirebaseRef.set(stdout);
+
 	    }
 	  });
 

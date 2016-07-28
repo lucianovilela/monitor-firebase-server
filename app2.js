@@ -3,7 +3,7 @@
 var Firebase = require("firebase");
 var fs = require('fs');
 var sys = require('util');
-var exec = require('child_process').exec, child, child1;
+var exec = require('child_process').exec, child;
 var _=require('underscore');
 
 
@@ -17,41 +17,32 @@ var commands = require('./config.json');
     storageBucket: "ehatdig.appspot.com",
   };
  Firebase.initializeApp(config);
+ var ref = Firebase.database().ref('monitor').child("commands");
+ _.each(commands, function(command){
+   ref.child(command.name).set(command);
+
+ });
 
 
-var fastTime = 5000; // Time used to check the memory buffered and CPU Temp.
-var customTime = 60000; // Time used to check the uptime.
-var slowTime = 10000; // Time used to check the top list and CPU usage.
-
-var ref = Firebase.database().ref('comandos');
-
-ref.on("child_removed", function(snapshot, prevChildKey){
-      console.log(snapshot.val());
-      commands.push(snapshot.val());
-
-    }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code);
-    }
-);
-
-
+ref = Firebase.database().ref('monitor').child("database");
 setInterval(function(){
   _.each(commands, function(command){
-    console.log(_.now());
-    console.log(command);
-    if(command.nextexec == undefined || _.now() >= command.nextexec){
-        child = exec(command.exec, function (error, stdout, stderr) {
-            if (error !== null) {
-              console.error('exec error: ' + error);
-            } else {
-              console.log(command.name + " " + stdout);
-            }
-          }
-        );
-        command.nextexec = _.now() + command.time;
-    }
 
+        if(command.nextexec == undefined || _.now() >= command.nextexec){
+            child = exec(command.exec, function (error, stdout, stderr) {
+                if (error !== null) {
+                  ref.child(command.name).child("error").push().set(_.now()+":"+error);
+                  console.error('exec error: ' + error);
+                } else {
+                  stdout = stdout.replace("\n", "");
+                  console.log(command.name + " " + stdout);
+                  ref.child(command.name).child("data").push().set(stdout);
 
+                }
+              }
+            );
+            command.nextexec = _.now() + command.time;
+        }
   });
 
 

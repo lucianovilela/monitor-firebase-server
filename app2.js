@@ -36,7 +36,7 @@ setInterval(function(){
                 } else {
                   stdout = stdout.replace("\n", "");
                   console.log(command.name + " " + stdout);
-                  ref.child(command.name).child("data").push().set(stdout);
+                  ref.child(command.name).child("data").child(_.now()).set(stdout);
 
                 }
               }

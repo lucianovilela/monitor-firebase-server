@@ -1,12 +1,16 @@
 [
   {"name":"temperatura",
    "exec":"cat /sys/class/thermal/thermal_zone0/temp",
-   "time":5000
+   "time":5000,
+   "max":0,
+   "min":0
  },
 
  {"name":"memoria livre",
   "exec":"egrep --color 'MemFree' /proc/meminfo | egrep '[0-9.]{4,}' -o",
-  "time":10000
-  }
+  "time":10000,
+  "max":0,
+  "min":0
 
+  }
 ]

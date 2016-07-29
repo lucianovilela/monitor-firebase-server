@@ -31,12 +31,17 @@ setInterval(function(){
         if(command.nextexec == undefined || _.now() >= command.nextexec){
             child = exec(command.exec, function (error, stdout, stderr) {
                 if (error !== null) {
-                  ref.child(command.name).child("error").push().set(_.now()+":"+error);
-                  console.error('exec error: ' + error);
+                  var obj = { time: _.now(),
+                              value : error};
+
+                  ref.child(command.name).child("error").push().set(error);
                 } else {
                   stdout = stdout.replace("\n", "");
-                  console.log(command.name + " " + stdout);
-                  ref.child(command.name).child("data").child(_.now()).set(stdout);
+
+                    var obj = { time: _.now(),
+                                value : stdout};
+
+                  ref.child(command.name).child("data").push().set(obj);
 
                 }
               }

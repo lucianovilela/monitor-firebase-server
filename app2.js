@@ -38,7 +38,7 @@ setInterval(function(){
                 } else {
                   stdout = stdout.replace("\n", "");
 
-                    var obj = { time: _.now(),
+                    var obj = { time: Firebase.,
                                 value : stdout};
 
                   ref.child(command.name).child("data").push().set(obj);

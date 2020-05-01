@@ -2,9 +2,12 @@
   "name": "Raspberry-Pi-Info-To-Firebase",
   "version": "0.1.0",
   "description": "Raspberry Pi / Linux system info to Firebase in realtime",
-  "main": "app.js",
+  "main": "app2.js",
   "repository": "https://github.com/UlisesGascon/raspberrypi-system-info-data-to-firebase",
   "author": "Ulises Gascon",
+  "scripts": {
+    "start": "node app2.js"
+  },
   "dependencies": {
     "child-process-promise": "*",
     "firebase": "^3.1.0",

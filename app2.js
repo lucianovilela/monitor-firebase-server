@@ -22,22 +22,21 @@ commands.map((command) => {
 });
 
 ref = Firebase.database().ref("monitor").child("database");
-commands.map((command) => {
-  setInterval(function () {
+commands.map(command => {
+  setInterval(()=> {
     console.debug(new Date(), command.exec);
     child = exec(command.exec, function (error, stdout, stderr) {
       if (error !== null) {
         var obj = { time: new Date(), value: error };
 
-        ref.child(command.name).child("error").push().set(error);
+        ref.child(command.name).child("error").push().set(obj);
       } else {
         stdout = stdout.replace("\n", "");
 
-        var obj = { time: _.now(), value: stdout };
+        var obj = { time: new Date(), value: stdout };
 
         ref.child(command.name).child("data").push().set(obj);
       }
     });
-    command.nextexec = _.now() + command.time;
   }, command.time);
 });
